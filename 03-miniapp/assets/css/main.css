@@ -1,3 +1,66 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+:root {
+    --primary-color: #7af17a;
+    --secondary-color: #e6f4e9;
+    --white: #fff;
+    --eerie-black: #1c1e1c;
+}
+
+h1 {
+    font-family: "Public Sans", sans-serif;
+    font-weight: 700;
+    font-size: 32px;
+    color: var(--white);
+}
+
+h2 {
+    font-family: "Public Sans", sans-serif;
+    font-weight: 700;
+    font-size: 24px;
+    color: var(--white);
+}
+
+body {
+    font-family: "Public Sans", sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    color: var(--white);
+    background: var(--eerie-black);
+}
+
+.container {
+    margin: 2em;
+    padding: 2em 3em;
+    border-radius: 8px;
+}
+
+.container--primary {
+    background-color: var(--primary-color);
+    color: var(--eerie-black);
+
+    h1,h2 {
+        color: var(--eerie-black);
+    }
+}
+
+.container--white {
+    background-color: var(--white);
+    color: var(--eerie-black);
+
+    h1 {
+        color: var(--eerie-black);
+    }
+}
+
+.is-button {
+    font-family: "Public Sans", sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    text-align: center;
+    background-color: var(--secondary-color);
+    color: var(--eerie-black);
+    text-decoration: none;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5em 1em;
+    cursor: pointer;
+}
