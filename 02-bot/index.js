@@ -6,7 +6,8 @@ const { enter, leave } = Scenes.Stage;
 
 const bot = new Telegraf(botApiKey);
 
-bot.launch();
+bot.use(session());
+
 
 const sendMessage = (ctx, message) => bot.telegram.sendMessage(ctx.chat.id, message)
 
@@ -18,16 +19,14 @@ const commands = [
     ['balance', 'check your game balance']
 ]
 
-bot.command('start', ctx => {
+bot.command('start', async (ctx) => {
     const { from } = ctx;
     ctx.session ??= {balance : 100}
-    sendMessage(ctx, `Hello ${from.first_name} ${from.last_name}`);
-    sendMessage(ctx,
-        `How can I help you today?\n
-You can try some of my built in commands like:
-/help that lists all of my commands
-/flip to flip a coin`)
+    await sendMessage(ctx, `Hello ${from.first_name} ${from.last_name}`);
+    await sendMessage(ctx, `How can I help you today? You can use /help to get list of all my commands`)
 })
+
+bot.command('balance', async (ctx) => await sendMessage(ctx, `Your balance is ${ctx.session?.balance}`))
 
 bot.command('help', ctx => {
     [
@@ -35,7 +34,7 @@ bot.command('help', ctx => {
         commands
             .map(([command, description]) => `/${command} - ${description}\n`)
             .reduce((previous, current) => `${previous}${current}`)
-    ].forEach(mes => sendMessage(ctx, mes));
+    ].forEach(async (mes) => await sendMessage(ctx, mes));
 });
 
 bot.command('flip', async (ctx) => {
@@ -51,24 +50,53 @@ const flipCoinGame = async (userPick, ctx) => {
     userPick = userPick === 'heads' ? 0 : 1;
     const botPick = userPick === 0 ? 1 : 0;
     await sendMessage(ctx, `Your pick is ${userPick}, my pick is ${botPick}.`)
-    await sendMessage(ctx, `I am flipping the coin!`)
-    await sendMessage(ctx, `I flipped x, I win`)
-    await sendMessage(ctx, `Goodbye`)
-    ctx.scene.leave()
+
+    await bot.telegram.sendVideo(ctx.chat.id, 'https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExamM4NWt1eWkzemw3ZmtvcGh6ZDQxbGFlbjQyaDJhMjlpeDRsMHptcCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/FfrlRYkqKY1lC/giphy.gif')
+    const coinFlip = Math.round(Math.random());
+
+    setTimeout(async () => {
+        await sendMessage(ctx, `I flipped the coin and got ${coinFlip === 0 ? 'head' : 'tail'}`)
+        
+        if(coinFlip === userPick) {
+            if(ctx.session?.balance) {
+                ctx.session.balance += 20;
+            }
+            await sendMessage(ctx, `You won and got 30, you current balance is ${ctx.session?.balance}`)
+        } else {
+            await sendMessage(ctx, `You lost, you current balance is ${ctx.session?.balance}`)
+        }
+        ctx.scene.leave()
+    }, 1000);
+
 }
 
 const flipGameScene = new Scenes.BaseScene("flipGameScene");
-flipGameScene.enter((ctx) => ctx.reply(`You are doomed, it is time for THE FLIP GAME. Do you chose /heads or /tail?`));
+flipGameScene.enter(async (ctx) => {
+    try {
+        ctx.session.balance = ctx.session.balance - 20;
+        await sendMessage(ctx, `You are doomed, it is time for THE FLIP GAME. Your balance will be reduced by 20, if you win you get 30. Your current balance is ${ctx.session?.balance ?? 0}.`);
+        if(ctx.session.balance < 0) {
+            await sendMessage(ctx, `Your balance is too low, exiting game (tip: try /start command to refresh your balance)`);
+            ctx.scene.leave('flipGameScene');
+            throw new Error("Balance too low");
+        }
+    } catch(e) {
+        console.error(e);
+        return;
+    }
+
+    await sendMessage(ctx, `What do you choose?\n\t/heads\n\t/tail`)
+});
 flipGameScene.command("exit", leave());
 flipGameScene.command("heads", ctx => flipCoinGame("heads", ctx));
 flipGameScene.command("tail", ctx => flipCoinGame("tail", ctx));
-flipGameScene.leave((ctx) => ctx.reply("Thank you for playing"))
-
+flipGameScene.leave((ctx) => ctx.reply("Thank you for playing - play again? /tailGame"))
 
 
 const stage = new Scenes.Stage([flipGameScene]);
-bot.use(session()); // to  be precise, session is not a must have for Scenes to work, but it sure is lonely without one
 bot.use(stage.middleware());
+bot.launch();
+
 
 bot.command('flipGame', ctx => {
     ctx.scene.enter('flipGameScene')
