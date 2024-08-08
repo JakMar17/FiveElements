@@ -45,7 +45,10 @@ bot.command('flip', async (ctx) => {
     }, 1000);
 });
 
-//scene
+/*
+ * FLIP COIN GAME
+ */
+
 const flipCoinGame = async (userPick, ctx) => {
     userPick = TailLib.stringToNumber(userPick);
     const botPick = TailLib.pickReverse(userPick);
@@ -100,9 +103,10 @@ flipGameScene.leave((ctx) => ctx.reply("Thank you for playing - play again? /fli
 
 const stage = new Scenes.Stage([flipGameScene]);
 bot.use(stage.middleware());
-bot.launch();
-
 
 bot.command('flipGame', ctx => {
     ctx.scene.enter('flipGameScene')
-})
+});
+
+
+bot.launch();
