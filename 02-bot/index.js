@@ -1,5 +1,6 @@
 const botApiKey = "7168692522:AAF4ipSeFm_GwfT-bZ1hjA0JLwFIddQR6Ug"
 
+const { TailLib } = require('./lib/tailLib');
 const { Telegraf, Scenes, session } = require("telegraf");
 // Handler factories
 const { enter, leave } = Scenes.Stage;
@@ -21,7 +22,7 @@ const commands = [
 
 bot.command('start', async (ctx) => {
     const { from } = ctx;
-    ctx.session ??= {balance : 100}
+    ctx.session ??= { balance: 100 }
     await sendMessage(ctx, `Hello ${from.first_name} ${from.last_name}`);
     await sendMessage(ctx, `How can I help you today? You can use /help to get list of all my commands`)
 })
@@ -38,28 +39,28 @@ bot.command('help', ctx => {
 });
 
 bot.command('flip', async (ctx) => {
-    const coinFlip = Math.round(Math.random());
     await bot.telegram.sendVideo(ctx.chat.id, 'https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExamM4NWt1eWkzemw3ZmtvcGh6ZDQxbGFlbjQyaDJhMjlpeDRsMHptcCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/FfrlRYkqKY1lC/giphy.gif')
     setTimeout(() => {
-        sendMessage(ctx, `I flipped - ${coinFlip === 0 ? 'head': 'tail'}`)
+        sendMessage(ctx, `I flipped - ${TailLib.numberToString(TailLib.coinFlip())}`)
     }, 1000);
 });
 
 //scene
 const flipCoinGame = async (userPick, ctx) => {
-    userPick = userPick === 'heads' ? 0 : 1;
-    const botPick = userPick === 0 ? 1 : 0;
-    await sendMessage(ctx, `Your pick is ${userPick}, my pick is ${botPick}.`)
+    userPick = TailLib.stringToNumber(userPick);
+    const botPick = TailLib.pickReverse(userPick);
+    const coinFlip = TailLib.coinFlip();
+
+    await sendMessage(ctx, `Your pick is ${TailLib.numberToString(userPick)}, my pick is ${TailLib.numberToString(botPick)}.`)
 
     await bot.telegram.sendVideo(ctx.chat.id, 'https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExamM4NWt1eWkzemw3ZmtvcGh6ZDQxbGFlbjQyaDJhMjlpeDRsMHptcCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/FfrlRYkqKY1lC/giphy.gif')
-    const coinFlip = Math.round(Math.random());
 
     setTimeout(async () => {
-        await sendMessage(ctx, `I flipped the coin and got ${coinFlip === 0 ? 'head' : 'tail'}`)
-        
-        if(coinFlip === userPick) {
-            if(ctx.session?.balance) {
-                ctx.session.balance += 20;
+        await sendMessage(ctx, `I flipped the coin and got ${TailLib.numberToString(coinFlip)}`)
+
+        if (coinFlip === userPick) {
+            if (ctx.session?.balance) {
+                ctx.session.balance += 30;
             }
             await sendMessage(ctx, `You won and got 30, you current balance is ${ctx.session?.balance}`)
         } else {
@@ -73,24 +74,28 @@ const flipCoinGame = async (userPick, ctx) => {
 const flipGameScene = new Scenes.BaseScene("flipGameScene");
 flipGameScene.enter(async (ctx) => {
     try {
-        ctx.session.balance = ctx.session.balance - 20;
+        ctx.session ??= {balance : 100};
+        ctx.session.balance = (ctx.session.balance ?? 100) - 20;
+
         await sendMessage(ctx, `You are doomed, it is time for THE FLIP GAME. Your balance will be reduced by 20, if you win you get 30. Your current balance is ${ctx.session?.balance ?? 0}.`);
-        if(ctx.session.balance < 0) {
+        
+        if (ctx.session.balance < 0) {
             await sendMessage(ctx, `Your balance is too low, exiting game (tip: try /start command to refresh your balance)`);
             ctx.scene.leave('flipGameScene');
             throw new Error("Balance too low");
         }
-    } catch(e) {
+
+    } catch (e) {
         console.error(e);
         return;
     }
 
-    await sendMessage(ctx, `What do you choose?\n\t/heads\n\t/tail`)
+    await sendMessage(ctx, `What do you choose?\n\t/head\n\t/tail`)
 });
 flipGameScene.command("exit", leave());
-flipGameScene.command("heads", ctx => flipCoinGame("heads", ctx));
+flipGameScene.command("head", ctx => flipCoinGame("head", ctx));
 flipGameScene.command("tail", ctx => flipCoinGame("tail", ctx));
-flipGameScene.leave((ctx) => ctx.reply("Thank you for playing - play again? /tailGame"))
+flipGameScene.leave((ctx) => ctx.reply("Thank you for playing - play again? /flipGame"))
 
 
 const stage = new Scenes.Stage([flipGameScene]);
