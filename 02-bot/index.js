@@ -1,9 +1,11 @@
 const botApiKey = "7168692522:AAF4ipSeFm_GwfT-bZ1hjA0JLwFIddQR6Ug"
 
 const { TailLib } = require('./lib/tailLib');
-const { Telegraf, Scenes, session } = require("telegraf");
+const { Telegraf, Scenes, session, Format, Markup } = require("telegraf");
+
 // Handler factories
 const { enter, leave } = Scenes.Stage;
+const { link } = Format;
 
 const bot = new Telegraf(botApiKey);
 
@@ -108,5 +110,30 @@ bot.command('flipGame', ctx => {
     ctx.scene.enter('flipGameScene')
 });
 
+
+bot.command("inlinekb", ctx =>
+	ctx.reply(
+		"Launch mini app from inline keyboard!",
+		Markup.inlineKeyboard([Markup.button.webApp("Launch", "https://www.google.com")]),
+	),
+);
+
+bot.on("inline_query", ctx =>
+	ctx.answerInlineQuery([], {
+		button: { text: "Launch", web_app: { url: WEB_APP_URL } },
+	}),
+);
+
+bot.command("link", ctx =>
+	/*
+		Go to @Botfather and create a new app for your bot first, using /newapp
+		Then modify this link appropriately.
+	
+		startapp is optional.
+		If provided, it will be passed as start_param in initData
+		and as ?tgWebAppStartParam=$command in the Web App URL
+	*/
+	ctx.reply(link("Launch", "https://t.me/FiveElementsJakMarsBot/FiveElementsJakMarsMiniApp")),
+);
 
 bot.launch();
