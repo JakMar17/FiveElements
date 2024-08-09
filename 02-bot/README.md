@@ -57,14 +57,6 @@ After you had prepared `.env`˙file and run `npm install` you can start bot scri
 node --env-file=.env .\index.js
 ```
 
-### Executing program
-
-* How to run the program
-* Step-by-step bullets
-```
-code blocks for commands
-```
-
 ## Running inside Docker container
 
 Bot can also be run inside Docker container (for this you need to have docker installed on your computer).

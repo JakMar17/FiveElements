@@ -1,75 +1,49 @@
-# Nuxt 3 Minimal Starter
+# 5Element: Telegram bot
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+This project is part of technical interview for company 5Element.
 
-## Setup
+## Description
 
-Make sure to install the dependencies:
+This is simple `NuxtJS` Telegram mini app that implements Stripe payment links to process transactions. Mini app can be accessed with `@FiveElementsJakMarsBot` with `/start` command.
 
-```bash
-# npm
+### Technical background
+
+Mini app is developed in `NuxtJS` framework running on `NodeJS` platform. It is hosted on [Netlify](https://fiveelementsjakmarsminiapp.netlify.app/).
+
+For Stripe integartion mini app uses different Stripe payment links.
+
+## Getting Started
+
+### Dependencies
+
+Before installing script, you need to have `node` and `npm` installed on your computer.
+
+Project dependencies can later be installed using
+
+```
 npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
 ```
 
-## Development Server
+### Installing and executing
 
-Start the development server on `http://localhost:3000`:
+After you run `npm install` you can start dev server using
 
-```bash
-# npm
+```
 npm run dev
-
-# pnpm
-pnpm run dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
 ```
+
+App will be available on [http://localhost:3000](http://localhost:3000).
 
 ## Production
 
 Build the application for production:
 
 ```bash
-# npm
 npm run build
-
-# pnpm
-pnpm run build
-
-# yarn
-yarn build
-
-# bun
-bun run build
 ```
 
 Locally preview production build:
 
 ```bash
-# npm
 npm run preview
-
-# pnpm
-pnpm run preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
 ```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
