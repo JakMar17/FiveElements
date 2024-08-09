@@ -25,7 +25,7 @@
 
 <script lang="ts" setup>
 
-const app = undefined;
+let app = undefined;
 
 onMounted(() => {
     app = window.Telegram.WebApp;
