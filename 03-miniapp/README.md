@@ -1,4 +1,4 @@
-# 5Element: Telegram bot
+# 5Element: Telegram mini app
 
 This project is part of technical interview for company 5Element.
 
