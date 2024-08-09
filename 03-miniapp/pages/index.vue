@@ -32,7 +32,7 @@ onMounted(() => {
     app.ready();
 });
 
-openDialog() {
+function openDialog() {
     app.showPopup({
         title: 'Title',
         message: 'Some message',
