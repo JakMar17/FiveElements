@@ -1,7 +1,7 @@
 const botApiKey = "7168692522:AAF4ipSeFm_GwfT-bZ1hjA0JLwFIddQR6Ug"
 
 const { TailLib } = require('./lib/tailLib');
-const { Telegraf, Scenes, session, Format, Markup } = require("telegraf");
+const { Telegraf, Scenes, session, Format, Markup, Telegram } = require("telegraf");
 
 // Handler factories
 const { enter, leave } = Scenes.Stage;
@@ -12,7 +12,7 @@ const bot = new Telegraf(botApiKey);
 bot.use(session());
 
 
-const sendMessage = (ctx, message) => bot.telegram.sendMessage(ctx.chat.id, message)
+const sendMessage = (ctx, message, ...args) => bot.telegram.sendMessage(ctx.chat.id, message, ...args)
 
 const commands = [
     ['start', "start with bot interaction"],
@@ -26,7 +26,15 @@ bot.command('start', async (ctx) => {
     const { from } = ctx;
     ctx.session ??= { balance: 100 }
     await sendMessage(ctx, `Hello ${from.first_name} ${from.last_name}`);
-    await sendMessage(ctx, `How can I help you today? You can use /help to get list of all my commands`)
+    await sendMessage(ctx, `How can I help you today? You can use /help to get list of all my commands`);
+    return sendMessage(
+        ctx,
+        "What do you want to drink?",
+        Markup.inlineKeyboard([
+            Markup.button.callback("FlipGame", "flipGame"),
+            Markup.button.webApp("WebApp", "https://fiveelementsvanillajs.netlify.app/"),
+        ]),
+    );
 })
 
 bot.command('balance', async (ctx) => await sendMessage(ctx, `Your balance is ${ctx.session?.balance}`))
@@ -79,11 +87,11 @@ const flipCoinGame = async (userPick, ctx) => {
 const flipGameScene = new Scenes.BaseScene("flipGameScene");
 flipGameScene.enter(async (ctx) => {
     try {
-        ctx.session ??= {balance : 100};
+        ctx.session ??= { balance: 100 };
         ctx.session.balance = (ctx.session.balance ?? 100) - 20;
 
         await sendMessage(ctx, `You are doomed, it is time for THE FLIP GAME. Your balance will be reduced by 20, if you win you get 30. Your current balance is ${ctx.session?.balance ?? 0}.`);
-        
+
         if (ctx.session.balance < 0) {
             await sendMessage(ctx, `Your balance is too low, exiting game (tip: try /start command to refresh your balance)`);
             ctx.scene.leave('flipGameScene');
@@ -95,54 +103,23 @@ flipGameScene.enter(async (ctx) => {
         return;
     }
 
-    await sendMessage(ctx, `What do you choose?\n\t/head\n\t/tail`)
+    return await sendMessage(ctx, `What do you choose?`,
+        Markup.inlineKeyboard([
+            [Markup.button.callback("Head 🗣️", 'head')],
+            [Markup.button.callback("Tail 🔢", 'tail')]
+        ]),)
 });
 flipGameScene.command("exit", leave());
-flipGameScene.command("head", ctx => flipCoinGame("head", ctx));
-flipGameScene.command("tail", ctx => flipCoinGame("tail", ctx));
+flipGameScene.action("head", (ctx, next) => flipCoinGame("head", ctx).then(next()));
+flipGameScene.action("tail", (ctx, next) => flipCoinGame("tail", ctx).then(next()));
 flipGameScene.leave((ctx) => ctx.reply("Thank you for playing - play again? /flipGame"))
 
 
 const stage = new Scenes.Stage([flipGameScene]);
 bot.use(stage.middleware());
 
-bot.command('flipGame', ctx => {
-    ctx.scene.enter('flipGameScene')
-});
+bot.command('flipGame', ctx => ctx.scene.enter('flipGameScene'));
+bot.action('flipGame', ctx => ctx.scene.enter('flipGameScene'));
 
-
-bot.command("inlinekb", ctx =>
-	ctx.reply(
-		"Launch mini app from inline keyboard!",
-		Markup.inlineKeyboard([Markup.button.webApp("Launch", "http://t.me/FiveElementsJakMarsBot/FiveElementsJakMarsMiniApp")]),
-	),
-);
-
-bot.on("inline_query", ctx =>
-	ctx.answerInlineQuery([], {
-		button: { text: "Launch", web_app: { url: "http://t.me/FiveElementsJakMarsBot/FiveElementsJakMarsMiniApp" } },
-	}),
-);
-
-bot.command("setmenu", ctx =>
-	// sets Web App as the menu button for current chat
-	ctx.setChatMenuButton({
-		text: "Launch",
-		type: "web_app",
-		web_app: { url: 'https://fiveelementsjakmarsminiapp.netlify.app/' },
-	}),
-);
-
-bot.command("link", ctx =>
-	/*
-		Go to @Botfather and create a new app for your bot first, using /newapp
-		Then modify this link appropriately.
-	
-		startapp is optional.
-		If provided, it will be passed as start_param in initData
-		and as ?tgWebAppStartParam=$command in the Web App URL
-	*/
-	ctx.reply(link("Launch", "https://t.me/FiveElementsJakMarsBot/FiveElementsJakMarsMiniApp")),
-);
 
 bot.launch();
