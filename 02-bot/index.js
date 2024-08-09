@@ -1,11 +1,10 @@
-const botApiKey = "7168692522:AAF4ipSeFm_GwfT-bZ1hjA0JLwFIddQR6Ug"
+const botApiKey = '7168692522:AAF4ipSeFm_GwfT-bZ1hjA0JLwFIddQR6Ug'
 
 const { TailLib } = require('./lib/tailLib');
-const { Telegraf, Scenes, session, Format, Markup, Telegram } = require("telegraf");
+const { Telegraf, Scenes, session, Format, Markup, Telegram } = require('telegraf');
 
 // Handler factories
 const { enter, leave } = Scenes.Stage;
-const { link } = Format;
 
 const bot = new Telegraf(botApiKey);
 
@@ -15,10 +14,10 @@ bot.use(session());
 const sendMessage = (ctx, message, ...args) => bot.telegram.sendMessage(ctx.chat.id, message, ...args)
 
 const commands = [
-    ['start', "start with bot interaction"],
-    ['help', "list of all available commands"],
-    ['flip', "flip a coin"],
-    ['flipGame', "play a gem of coin flipping with me!"],
+    ['start', 'start with bot interaction'],
+    ['help', 'list of all available commands'],
+    ['flip', 'flip a coin'],
+    ['flipGame', 'play a gem of coin flipping with me!'],
     ['balance', 'check your game balance']
 ]
 
@@ -29,10 +28,10 @@ bot.command('start', async (ctx) => {
     await sendMessage(ctx, `How can I help you today? You can use /help to get list of all my commands`);
     return sendMessage(
         ctx,
-        "What do you want to drink?",
+        'What do you want to drink?',
         Markup.inlineKeyboard([
-            Markup.button.callback("FlipGame", "flipGame"),
-            Markup.button.webApp("WebApp", "https://fiveelementsvanillajs.netlify.app/"),
+            Markup.button.callback('FlipGame', 'flipGame'),
+            Markup.button.webApp('WebApp', 'https://fiveelementsvanillajs.netlify.app/'),
         ]),
     );
 })
@@ -41,7 +40,7 @@ bot.command('balance', async (ctx) => await sendMessage(ctx, `Your balance is ${
 
 bot.command('help', ctx => {
     [
-        "Here is list of all my available commands, that you can try:",
+        'Here is list of all my available commands, that you can try:',
         commands
             .map(([command, description]) => `/${command} - ${description}\n`)
             .reduce((previous, current) => `${previous}${current}`)
@@ -84,7 +83,7 @@ const flipCoinGame = async (userPick, ctx) => {
 
 }
 
-const flipGameScene = new Scenes.BaseScene("flipGameScene");
+const flipGameScene = new Scenes.BaseScene('flipGameScene');
 flipGameScene.enter(async (ctx) => {
     try {
         ctx.session ??= { balance: 100 };
@@ -95,7 +94,7 @@ flipGameScene.enter(async (ctx) => {
         if (ctx.session.balance < 0) {
             await sendMessage(ctx, `Your balance is too low, exiting game (tip: try /start command to refresh your balance)`);
             ctx.scene.leave('flipGameScene');
-            throw new Error("Balance too low");
+            throw new Error('Balance too low');
         }
 
     } catch (e) {
@@ -105,14 +104,14 @@ flipGameScene.enter(async (ctx) => {
 
     return await sendMessage(ctx, `What do you choose?`,
         Markup.inlineKeyboard([
-            [Markup.button.callback("Head 🗣️", 'head')],
-            [Markup.button.callback("Tail 🔢", 'tail')]
+            [Markup.button.callback('Head 🗣️', 'head')],
+            [Markup.button.callback('Tail 🔢', 'tail')]
         ]),)
 });
-flipGameScene.command("exit", leave());
-flipGameScene.action("head", (ctx, next) => flipCoinGame("head", ctx).then(next()));
-flipGameScene.action("tail", (ctx, next) => flipCoinGame("tail", ctx).then(next()));
-flipGameScene.leave((ctx) => ctx.reply("Thank you for playing - play again? /flipGame"))
+flipGameScene.command('exit', leave());
+flipGameScene.action('head', (ctx, next) => flipCoinGame('head', ctx).then(next()));
+flipGameScene.action('tail', (ctx, next) => flipCoinGame('tail', ctx).then(next()));
+flipGameScene.leave((ctx) => ctx.reply('Thank you for playing - play again? /flipGame'))
 
 
 const stage = new Scenes.Stage([flipGameScene]);
