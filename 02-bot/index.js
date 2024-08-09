@@ -1,7 +1,7 @@
 const botApiKey = process.env.BOT_API;
 
 const { TailLib } = require('./lib/tailLib');
-const { Telegraf, Scenes, session, Format, Markup, Telegram } = require('telegraf');
+const { Telegraf, Scenes, session, Format, Markup } = require('telegraf');
 
 // Handler factories
 const { enter, leave } = Scenes.Stage;
@@ -25,13 +25,12 @@ bot.command('start', async (ctx) => {
     const { from } = ctx;
     ctx.session ??= { balance: 100 }
     await sendMessage(ctx, `Hello ${from.first_name} ${from.last_name}`);
-    await sendMessage(ctx, `How can I help you today? You can use /help to get list of all my commands`);
     return sendMessage(
         ctx,
-        'What do you want to drink?',
+        'How can I help you today? You can use /help to get list of all my commands',
         Markup.inlineKeyboard([
             Markup.button.callback('FlipGame', 'flipGame'),
-            Markup.button.webApp('WebApp', 'https://fiveelementsvanillajs.netlify.app/'),
+            Markup.button.webApp('MiniApp', process.env.MINI_APP_URL),
         ]),
     );
 })
