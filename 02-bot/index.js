@@ -1,4 +1,4 @@
-const botApiKey = '7168692522:AAF4ipSeFm_GwfT-bZ1hjA0JLwFIddQR6Ug'
+const botApiKey = process.env.BOT_API;
 
 const { TailLib } = require('./lib/tailLib');
 const { Telegraf, Scenes, session, Format, Markup, Telegram } = require('telegraf');
@@ -49,6 +49,7 @@ bot.command('help', ctx => {
 
 bot.command('flip', async (ctx) => {
     await bot.telegram.sendVideo(ctx.chat.id, 'https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExamM4NWt1eWkzemw3ZmtvcGh6ZDQxbGFlbjQyaDJhMjlpeDRsMHptcCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/FfrlRYkqKY1lC/giphy.gif')
+    await ctx.sendChatAction('typing');
     setTimeout(() => {
         sendMessage(ctx, `I flipped - ${TailLib.numberToString(TailLib.coinFlip())}`)
     }, 1000);
@@ -66,7 +67,7 @@ const flipCoinGame = async (userPick, ctx) => {
     await sendMessage(ctx, `Your pick is ${TailLib.numberToString(userPick)}, my pick is ${TailLib.numberToString(botPick)}.`)
 
     await bot.telegram.sendVideo(ctx.chat.id, 'https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExamM4NWt1eWkzemw3ZmtvcGh6ZDQxbGFlbjQyaDJhMjlpeDRsMHptcCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/FfrlRYkqKY1lC/giphy.gif')
-
+    await ctx.sendChatAction('typing');
     setTimeout(async () => {
         await sendMessage(ctx, `I flipped the coin and got ${TailLib.numberToString(coinFlip)}`)
 
