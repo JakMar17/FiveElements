@@ -17,7 +17,7 @@
                 <a class="is-button" href="https://buy.stripe.com/test_3csaGfc1q2zu2v67st">20 €</a>
                 <a class="is-button" href="https://buy.stripe.com/test_bIY7u38Pegqkc5GbIK">40 €</a>
                 <a class="is-button" href="https://buy.stripe.com/test_dR6cOn5D27TOc5GaEH">100 €</a>
-                <button @click="" class="is-button">Dialog</button>
+                <button @click="openDialog()" class="is-button">Dialog</button>
             </div>
         </main>
     </ClientOnly>
