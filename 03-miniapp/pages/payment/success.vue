@@ -4,6 +4,10 @@
             <h2>
                 Payment successful!
             </h2>
+
+            <NuxtLink to="/" class="is-button">
+                Go back
+            </NuxtLink>
         </div>
     </div>
 </template>

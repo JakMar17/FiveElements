@@ -1,6 +1,5 @@
 <template>
     <ClientOnly>
-
         <main style="height: 100%;">
             <div class="container container--primary"
                 style="display: flex; align-items: center; flex-direction: column;">
@@ -16,34 +15,15 @@
             <div class="container" style="display: flex; align-items: stretch; flex-direction: column; gap: 2em">
                 <a class="is-button" href="https://buy.stripe.com/test_3csaGfc1q2zu2v67st">20 €</a>
                 <a class="is-button" href="https://buy.stripe.com/test_bIY7u38Pegqkc5GbIK">40 €</a>
-                <a class="is-button" href="https://buy.stripe.com/test_dR6cOn5D27TOc5GaEH">100 €</a>
-                <button @click="openDialog()" class="is-button">Dialog</button>
+                <a class="is-button" href="https://buy.stripe.com/test_3csg0zghG8XS2v628c">100 €</a>
             </div>
         </main>
     </ClientOnly>
 </template>
 
 <script lang="ts" setup>
-
-let app = undefined;
-
 onMounted(() => {
-    app = window.Telegram.WebApp;
+    const app = window.Telegram.WebApp;
     app.ready();
 });
-
-function openDialog() {
-    app.showPopup({
-        title: 'Title',
-        message: 'Some message',
-        buttons: [
-            { id: 'link', type: 'default', text: 'Open ton.org' },
-            { type: 'cancel' },
-        ]
-    }, (btn) => {
-        if (btn === 'link') {
-            Telegram.WebApp.openLink('https://ton.org/');
-        }
-    });
-}
 </script>
