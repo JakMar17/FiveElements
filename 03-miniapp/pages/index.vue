@@ -17,6 +17,7 @@
                 <a class="is-button" href="https://buy.stripe.com/test_3csaGfc1q2zu2v67st">20 €</a>
                 <a class="is-button" href="https://buy.stripe.com/test_bIY7u38Pegqkc5GbIK">40 €</a>
                 <a class="is-button" href="https://buy.stripe.com/test_dR6cOn5D27TOc5GaEH">100 €</a>
+                <buttong @click="" class="is-button">Dialog</>
             </div>
         </main>
     </ClientOnly>
@@ -24,11 +25,25 @@
 
 <script lang="ts" setup>
 
+const app = undefined;
+
 onMounted(() => {
-    console.log('mounted');
-    const app = window.Telegram.WebApp;
-    console.log(app);
+    app = window.Telegram.WebApp;
     app.ready();
-    app.expand();
 });
+
+openDialog() {
+    app.showPopup({
+        title: 'Title',
+        message: 'Some message',
+        buttons: [
+            { id: 'link', type: 'default', text: 'Open ton.org' },
+            { type: 'cancel' },
+        ]
+    }, (btn) => {
+        if (btn === 'link') {
+            Telegram.WebApp.openLink('https://ton.org/');
+        }
+    });
+}
 </script>
